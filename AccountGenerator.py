@@ -46,7 +46,7 @@ class VerifyAccount():
         while self.Verified == False:
             self.EmailAccount = json.loads(requests.get(f"https://www.1secmail.com/api/v1/?action=getMessages&login={self.Email}&domain=1secmail.com").content.decode("utf-8"))
             time.sleep(1)
-            if self.EmailAccount[0]["subject"] == "BYOND Account Verification":
+            if self.EmailAccount and self.EmailAccount[0] and self.EmailAccount[0]["subject"] == "BYOND Account Verification":
                 self.Verified = True
                 return self.__get_link(self.__get_content())
     def __get_content(self):
@@ -59,6 +59,7 @@ class ControllerMain():
         self.Username = Faker().first_name() + str(randint(30, 9999)) + Faker().last_name() + str(randint(1, 999))
         self.Password = Faker().first_name() + str(randint(9883033, 999090882))
         self.Email = Faker().first_name() + str(randint(9883033, 999090882)) + Faker().last_name()
+        self.Driver = webdriver.Firefox()
         self.Disabled = False
 
         self.Account = CreateAccount()
@@ -90,7 +91,8 @@ class ControllerMain():
             else:
                 raise NoSuchElementException("You are currently rate limited by BYOND, please try again later")
     def verify_account(self):
-        webdriver.Firefox().get(self.Verify.wait_email())
+        self.Driver.get(self.Verify.wait_email())
+        self.Driver.quit()
     def post_webhook(self):
         json_dump = json.dumps({
         "embeds": [
